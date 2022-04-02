@@ -4,10 +4,13 @@ TLDR: Versioning the documentation adds more work than its worth. Maybe reconsid
 > You release v1, and start immediately working on v2 (including its
 > docs). In this case, the current version is v2, which is in the ./docs
 > folder, while the latest version is v1, which is the version hosted at
-> example.com/docs and is browsed by most of your users. You release v1,
+> example.com/docs and is browsed by most of your users.
+
+> You release v1,
 > and will maintain it for some time before thinking about v2. In this
 > case, the current version and latest version will both be point to v1,
 > since the v2 docs doesn't even exist yet!
+
 From the [Docusaurus docs][docu-ver]
 
 #### [Method 1 Prototype branch][gh-method-1] (default docs are in `/website/versioned_docs/version-***/`)
