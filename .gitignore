@@ -24,9 +24,8 @@
 .idea
 
 # node_modules
-tests/node_modules
 dist/
-docs/learn/tests/node_modules
+**/node_modules/**
 
 # Integration CI dagger.mod, dagger.sum
 dagger.mod
