@@ -47,6 +47,12 @@ module.exports = {
           className: "header-github-link hide-target-icon",
           "aria-label": "GitHub repository",
         },
+		{
+          type: 'docsVersionDropdown',
+          position: 'right',
+          dropdownItemsAfter: [{to: '/versions', label: 'All versions'}],
+          dropdownActiveClassDisabled: false,
+        },
       ],
       hideOnScroll: true,
     },
@@ -68,11 +74,19 @@ module.exports = {
       {
         docs: {
           breadcrumbs: false,
-          path: "../docs",
+		  path: "../docs",
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl: "https://github.com/dagger/dagger/edit/main/website",
           routeBasePath: "/",
           remarkPlugins: [remarkCodeImport],
+		  lastVersion: 'current',
+		  exclude: ["**/node_modules/**"],
+      	  versions: {
+        	current: {
+          	  label: '0.2',
+         	  path: '/',
+        	},
+      	  },
         },
         gtag: {
           trackingID: "G-RDXG80F635",
