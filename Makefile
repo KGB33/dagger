@@ -71,8 +71,9 @@ universe-test: dagger-debug # Run universe tests
 
 .PHONY: doc-test
 doc-test: dagger-debug # Test docs
-	yarn --cwd "./docs/learn/tests" install
-	DAGGER_BINARY="$(shell pwd)/cmd/dagger/dagger-debug" yarn --cwd "./docs/learn/tests" test
+	@echo "0.2 docs don't have a learn/ directory"
+	# yarn --cwd "./docs/learn/tests" install 
+	# DAGGER_BINARY="$(shell pwd)/cmd/dagger/dagger-debug" yarn --cwd "./docs/learn/tests" test
 
 .PHONY: docs
 docs: dagger # Generate docs
@@ -84,7 +85,7 @@ docslint: docs # Generate & lint docs
 
 .PHONY: mdlint
 mdlint: # Markdown lint for web
-	@markdownlint ./docs README.md
+	@markdownlint ./docs README.md ./website/versioned_docs
 
 .PHONY: web
 web: # Run the website locally
