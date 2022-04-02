@@ -17,6 +17,13 @@ Default docs are in `./docs/`
 Quotes from the [Docusaurus docs][docu-ver].
 
 
+# Changing between Method 1 & 2 
+
+Method 1 is the default but chaining between the two is easy 
+and can be done at any time by adding/removing the version information 
+in `docusaurus.config.js`. 
+
+
 # Potential Universe Documentation Issues
 
 The packages downloaded by `dagger project update` might get out-of-sync 
