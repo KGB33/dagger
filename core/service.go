@@ -40,6 +40,8 @@ type Service struct {
 	HostUpstream string `json:"reverse_tunnel_upstream_addr,omitempty"`
 	// HostPorts configures the port forwarding rules for the host.
 	HostPorts []PortForward `json:"host_ports,omitempty"`
+	// Configures Healthchecks for the host.
+	HealthChecks []HealthChecker
 }
 
 func NewContainerService(ctr *Container) *Service {
@@ -200,6 +202,16 @@ func (svc *Service) Endpoint(ctx context.Context, svcs *Services, port int, sche
 	return endpoint, nil
 }
 
+func (svc *Service) WithTcpHealthCheck(ports []int) (*Service, error) {
+	var portList []Port;
+	for _, p := range ports {
+		portList = append(portList, Port{Port: p})
+	}
+
+	svc.HealthChecks = append(svc.HealthChecks, NewTCPHealth(svc, portList))
+	return svc, nil; 
+}
+
 func (svc *Service) Start(
 	ctx context.Context,
 	bk *buildkit.Client,
@@ -291,7 +303,12 @@ func (svc *Service) startContainer(
 
 	fullHost := host + "." + network.ClientDomain(clientMetadata.ClientID)
 
-	health := newHealth(bk, fullHost, ctr.Ports)
+	svc.HealthChecks = append(svc.HealthChecks, newHealth(ctr.Ports))
+
+	for _, check := range svc.HealthChecks {
+		check.Hydrate(bk, fullHost)
+	}
+
 
 	pbPlatform := pb.PlatformFromSpec(ctr.Platform)
 
@@ -346,9 +363,11 @@ func (svc *Service) startContainer(
 	}()
 
 	checked := make(chan error, 1)
-	go func() {
-		checked <- health.Check(ctx)
-	}()
+	for _, health := range svc.HealthChecks {
+		go func() {
+			checked <- health.Check(ctx)
+		}()
+	}
 
 	if execOp.Meta.ProxyEnv == nil {
 		execOp.Meta.ProxyEnv = &pb.ProxyEnv{}
@@ -628,7 +647,7 @@ func (svc *Service) startReverseTunnel(ctx context.Context, bk *buildkit.Client,
 		})
 	}
 
-	check := newHealth(bk, fullHost, checkPorts)
+	check := newHealth(checkPorts)
 
 	exited := make(chan error, 1)
 	go func() {

@@ -31,11 +31,12 @@ func (s *serviceSchema) Resolvers() Resolvers {
 	}
 
 	ResolveIDable[core.Service](rs, "Service", ObjectResolver{
-		"hostname": ToResolver(s.hostname),
-		"ports":    ToResolver(s.ports),
-		"endpoint": ToResolver(s.endpoint),
-		"start":    ToResolver(s.start),
-		"stop":     ToResolver(s.stop),
+		"hostname":           ToResolver(s.hostname),
+		"ports":              ToResolver(s.ports),
+		"endpoint":           ToResolver(s.endpoint),
+		"start":              ToResolver(s.start),
+		"stop":               ToResolver(s.stop),
+		"withTcpHealthCheck": ToResolver(s.withTcpHealthCheck),
 	})
 
 	return rs
@@ -60,6 +61,14 @@ type serviceEndpointArgs struct {
 
 func (s *serviceSchema) endpoint(ctx context.Context, parent *core.Service, args serviceEndpointArgs) (string, error) {
 	return parent.Endpoint(ctx, s.svcs, args.Port, args.Scheme)
+}
+
+type serviceWithTcpHealthCheckArgs struct {
+	Ports []int
+}
+
+func (s *serviceSchema) withTcpHealthCheck(ctx context.Context, parent *core.Service, args serviceWithTcpHealthCheckArgs) (*core.Service, error) {
+	return parent.WithTcpHealthCheck(args.Ports)
 }
 
 func (s *serviceSchema) start(ctx context.Context, parent *core.Service, args any) (core.ServiceID, error) {

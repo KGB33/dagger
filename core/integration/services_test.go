@@ -36,6 +36,26 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+func TestServicePortsSkipHealthCheck(t *testing.T) {
+	t.Parallel()
+
+	t.Run("Healthchecks pass when all ports are skipped", func(t *testing.T) {
+		c, ctx := connect(t)
+
+		srv := c.Container().
+			From("python").
+			WithExposedPort(6214).
+			WithExposedPort(6215).
+			WithExec([]string{"python", "-m", "http.server"}).
+			AsService().
+			WithTCPHealthCheck([]int{6214, 6215})
+			
+
+		_, err := srv.Start(ctx)
+		require.NoError(t, err)
+	})
+}
+
 func TestServiceHostnamesAreStable(t *testing.T) {
 	t.Parallel()
 

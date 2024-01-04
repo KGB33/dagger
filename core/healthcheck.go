@@ -15,18 +15,26 @@ import (
 	"github.com/vito/progrock"
 )
 
+type HealthChecker interface {
+	Check(context.Context) error
+	Hydrate(*buildkit.Client, string)
+}
+
 type portHealthChecker struct {
 	bk    *buildkit.Client
 	host  string
 	ports []Port
 }
 
-func newHealth(bk *buildkit.Client, host string, ports []Port) *portHealthChecker {
+func newHealth(ports []Port) *portHealthChecker {
 	return &portHealthChecker{
-		bk:    bk,
-		host:  host,
 		ports: ports,
 	}
+}
+
+func (d *portHealthChecker) Hydrate(bk *buildkit.Client, fullHost string) {
+	d.bk = bk
+	d.host = fullHost
 }
 
 func (d *portHealthChecker) Check(ctx context.Context) (err error) {
@@ -110,4 +118,27 @@ func (d *portHealthChecker) Check(ctx context.Context) (err error) {
 
 		return ctx.Err()
 	}
+}
+
+type TcpPortHealthChecker struct {
+	Srv   *Service
+	Bk    *buildkit.Client
+	Host  string
+	Ports []Port
+}
+
+func NewTCPHealth(srv *Service, ports []Port) *TcpPortHealthChecker {
+	return &TcpPortHealthChecker{
+		Srv:   srv,
+		Ports: ports,
+	}
+}
+
+func (d *TcpPortHealthChecker) Check(ctx context.Context) (err error) {
+	return nil
+}
+
+func (d *TcpPortHealthChecker) Hydrate(bk *buildkit.Client, fullHost string) {
+	d.Bk = bk
+	d.Host = fullHost
 }

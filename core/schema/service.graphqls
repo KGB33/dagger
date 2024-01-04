@@ -45,6 +45,14 @@ type Service {
   Stop the service.
   """
   stop: ServiceID!
+
+  """
+  Adds a TCP health check.
+  """
+  withTcpHealthCheck(
+    "TCP ports to check."
+    ports: [Int!]!
+  ): Service!
 }
 
 extend type Container {

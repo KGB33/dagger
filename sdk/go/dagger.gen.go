@@ -3939,6 +3939,14 @@ type Service struct {
 	start    *ServiceID
 	stop     *ServiceID
 }
+type WithServiceFunc func(r *Service) *Service
+
+// With calls the provided function with current Service.
+//
+// This is useful for reusability and readability by not breaking the calling chain.
+func (r *Service) With(f WithServiceFunc) *Service {
+	return f(r)
+}
 
 // ServiceEndpointOpts contains options for Service.Endpoint
 type ServiceEndpointOpts struct {
@@ -4076,6 +4084,17 @@ func (r *Service) Stop(ctx context.Context) (*Service, error) {
 	q := r.q.Select("stop")
 
 	return r, q.Execute(ctx, r.c)
+}
+
+// Adds a TCP health check.
+func (r *Service) WithTCPHealthCheck(ports []int) *Service {
+	q := r.q.Select("withTcpHealthCheck")
+	q = q.Arg("ports", ports)
+
+	return &Service{
+		q: q,
+		c: r.c,
+	}
 }
 
 type Socket struct {
